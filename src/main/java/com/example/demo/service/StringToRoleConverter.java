@@ -1,6 +1,7 @@
-package com.example.demo.model;
+package com.example.demo.service;
 
 
+import com.example.demo.model.Role;
 import com.example.demo.repository.RoleRepository;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
