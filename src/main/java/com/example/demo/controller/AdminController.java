@@ -1,92 +1,60 @@
 package com.example.demo.controller;
 
-
-import com.example.demo.model.Role;
 import com.example.demo.model.User;
-import com.example.demo.repository.RoleRepository;
-import com.example.demo.repository.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.example.demo.service.RoleService;
+import com.example.demo.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
+    private final RoleService roleService;
 
-    public AdminController(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
+    public AdminController(UserService userService, RoleService roleService) {
+        this.userService = userService;
+        this.roleService = roleService;
     }
 
     @GetMapping
-    public String admin(Model model) {
-        model.addAttribute("usersList", userRepository.findAll());
+    public String adminPanel(Model model) {
+        model.addAttribute("usersList", userService.findAll());
         return "admin/panel";
     }
 
     @GetMapping("/add_user")
     public String showAddForm(Model model) {
         model.addAttribute("user", new User());
-        model.addAttribute("roles", roleRepository.findAll());
+        model.addAttribute("roles", roleService.findAll());
         return "admin/add_user";
     }
 
     @PostMapping("/add")
     public String createUser(@ModelAttribute("user") User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        userService.save(user);
         return "redirect:/admin";
     }
 
     @GetMapping("/edit_user/{id}")
     public String showEditForm(Model model, @PathVariable int id) {
-        model.addAttribute("roles", roleRepository.findAll());
-        model.addAttribute("user", userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Пользователь с id=" + id + " не найден")));
+        model.addAttribute("roles", roleService.findAll());
+        model.addAttribute("user", userService.findById(id));
         return "admin/edit_user";
     }
+
     @PatchMapping("/edit_user/{id}")
     public String updateUser(@PathVariable int id,
                              @ModelAttribute("user") User formUser) {
-
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден: " + id));
-
-        // обновляем поля
-        existingUser.setUsername(formUser.getUsername());
-
-        // если пароль не пустой -> обновляем
-        if (formUser.getPassword() != null && !formUser.getPassword().isBlank()) {
-            existingUser.setPassword(passwordEncoder.encode(formUser.getPassword()));
-        }
-
-        // обновляем роли
-        if (formUser.getRoles() != null && !formUser.getRoles().isEmpty()) {
-            // подтянуть роли по id из формы
-            Set<Role> updatedRoles = formUser.getRoles().stream()
-                    .map(role -> roleRepository.findById(role.getId())
-                            .orElseThrow(() -> new IllegalArgumentException("Роль не найдена: " + role.getId())))
-                    .collect(Collectors.toSet());
-            existingUser.setRoles(updatedRoles);
-        } else {
-            existingUser.getRoles().clear();
-        }
-
-        userRepository.save(existingUser);
-
+        userService.update(formUser, id);
         return "redirect:/admin";
     }
 
     @DeleteMapping("/delete/{id}")
     public String deleteUser(@PathVariable("id") int id) {
-        userRepository.deleteById(id);
+        userService.delete(id);
         return "redirect:/admin";
     }
 

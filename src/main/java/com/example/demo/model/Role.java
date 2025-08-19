@@ -6,24 +6,16 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Set;
 
 @Entity
-@Table(
-        name = "role"
-)
+@Table(name = "role")
 public class Role implements GrantedAuthority {
     @Id
     private Long id;
     private String name;
     @Transient
-    @ManyToMany(
-            mappedBy = "roles"
-    )
+    @ManyToMany(mappedBy = "roles")
     private Set<User> users;
 
     public Role() {
-    }
-
-    public Role(Long id) {
-        this.id = id;
     }
 
     public Role(Long id, String name) {

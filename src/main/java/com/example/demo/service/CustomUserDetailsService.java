@@ -1,7 +1,8 @@
 package com.example.demo.service;
 
-import com.example.PP312.model.User;
-import com.example.PP312.repository.UserRepository;
+
+import com.example.demo.model.User;
+import com.example.demo.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return (UserDetails)this.userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Учетная запись: " + username + " не найдена"));
+        return this.userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Учетная запись: " + username + " не найдена"));
     }
 
     private static Collection<? extends GrantedAuthority> getAuthorities(User user) {

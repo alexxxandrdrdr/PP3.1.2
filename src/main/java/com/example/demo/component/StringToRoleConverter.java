@@ -1,5 +1,4 @@
-package com.example.demo.service;
-
+package com.example.demo.component;
 
 import com.example.demo.model.Role;
 import com.example.demo.repository.RoleRepository;
@@ -16,6 +15,6 @@ public class StringToRoleConverter implements Converter<String, Role> {
 
     public Role convert(String source) {
         Long id = Long.valueOf(source);
-        return this.roleRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Role not found: " + id));
+        return roleRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Роль не найдена: " + id));
     }
 }
