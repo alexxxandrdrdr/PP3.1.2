@@ -14,7 +14,7 @@ import java.util.Collection;
 @Component
 public class CustomSuccessHandler implements AuthenticationSuccessHandler {
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         Collection<? extends GrantedAuthority> roles = authentication.getAuthorities();
         var savedRequest = new HttpSessionRequestCache().getRequest(request, response);
         String targetUrl = (savedRequest != null)
