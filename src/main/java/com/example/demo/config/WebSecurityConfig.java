@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import com.example.demo.component.CustomSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -24,6 +25,10 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    public CustomSuccessHandler customSuccessHandler() {
+        return new CustomSuccessHandler();
+    }
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
@@ -32,18 +37,7 @@ public class WebSecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
-                        .successHandler((request, response, authentication) -> {
-                            Collection<? extends GrantedAuthority> roles = authentication.getAuthorities();
-                            var savedRequest = new HttpSessionRequestCache().getRequest(request, response);
-                            String targetUrl = savedRequest.getRedirectUrl();
-                            if (targetUrl != null && !targetUrl.equals("/") && !targetUrl.contains("continue")) {
-                                response.sendRedirect(targetUrl);
-                            } else if ((roles.stream().anyMatch(r -> "ROLE_ADMIN".equals(r.getAuthority())))) {
-                                response.sendRedirect("/admin");
-                            }else if ((roles.stream().anyMatch(r -> "ROLE_USER".equals(r.getAuthority())))) {
-                                response.sendRedirect("/user");
-                            }
-                        })
+                        .successHandler(customSuccessHandler())
                 )
                 .logout(Customizer.withDefaults());
 
