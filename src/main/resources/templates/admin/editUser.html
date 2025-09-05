@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактирование пользователя</title>
+</head>
+<body>
+<h1>Редактирование пользователя</h1>
+<div th:if="${error}" th:text="${error}" style="color: red;"></div>
+<div th:unless="${userDto} != null" style="color: red;">
+    Ошибка: данные пользователя недоступны.
+</div>
+<div th:if="${userDto} != null">
+    <form th:action="@{/admin/edit-user/{id}(id=${userDto.id})}"
+          th:object="${userDto}"
+          th:method="patch">
+        <div>
+            <label for="edit-id">Id</label>
+            <input type="text" id="edit-id" name="id" th:value="${userDto.id}" readonly />
+        </div>
+        <div>
+            <label for="edit-username">Имя пользователя</label>
+            <input type="text" id="edit-username" name="username" th:value="${userDto.username ?: ''}" />
+            <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color: red;"></span>
+        </div>
+        <div>
+            <label for="edit-password">Пароль</label>
+            <input type="password" id="edit-password" name="password"
+                   placeholder="Введите новый пароль (если нужно)" />
+        </div>
+        <div>
+            <label for="edit-roles">Роли</label>
+            <select id="edit-roles" name="roles" multiple>
+                <option th:each="role : ${rolesAll}"
+                        th:value="${role.id}"
+                        th:text="${role.name}"
+                        th:selected="${userDto.roleIds != null and userDto.roleIds.contains(role.id)}"></option>
+            </select>
+        </div>
+        <div>
+            <button type="submit">Сохранить</button>
+            <a th:href="@{/admin}">Отмена</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

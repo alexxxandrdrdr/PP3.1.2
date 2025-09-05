@@ -5,11 +5,13 @@ import com.example.demo.model.User;
 import com.example.demo.model.UserEditDto;
 import com.example.demo.service.RoleService;
 import com.example.demo.service.UserService;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -21,6 +23,7 @@ import static com.example.demo.service.RoleService.rolesToString;
 public class AdminController {
     private final UserService userService;
     private final RoleService roleService;
+    private final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     public AdminController(UserService userService, RoleService roleService) {
         this.userService = userService;
@@ -37,6 +40,11 @@ public class AdminController {
         return "admin/panel";
     }
 
+    @GetMapping("/addUser")
+    public String showCreateUser(@ModelAttribute("user") User user) {
+        userService.save(user);
+        return "admin/addNewUser";
+    }
 
     @PostMapping("/addUser")
     public String createUser(@ModelAttribute("user") User user) {
@@ -45,54 +53,34 @@ public class AdminController {
     }
 
     @GetMapping("/edit-user/{id}")
-    @ResponseBody
-    public Map<String, Object> getUserForEdit(@PathVariable Long id) {
-        User user = userService.findById(id);
+    public String getUserForEdit(@PathVariable Long id, Model model) {
+        try {
+            UserEditDto userDto = new UserEditDto(userService.findById(id));
+            if (userDto.getId() == null) {
+                logger.warn("userDto is null");
+                return "redirect:/admin";
+            }
+            List<Role> roles = roleService.findAll();
+            model.addAttribute("userDto", userDto);
+            model.addAttribute("rolesAll", roles);
+            return "admin/editUser";
+        } catch (Exception e) {
+            return "redirect:/admin";
+        }
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("user", user);
-        response.put("id", user.getId());
-        response.put("username", user.getUsername());
-        response.put("roleIds", user.getRoles().stream()
-                .map(Role::getId)
-                .toList());
-
-        return response;
     }
 
     @PatchMapping("/edit-user/{id}")
-    @ResponseBody
-    public Map<String, String> updateUser(@PathVariable Long id, @RequestBody UserEditDto userEditDto) {
-        if (userEditDto!= null && id != null) {
-            userService.updateUser(userEditDto,id);
-        } else throw new IllegalArgumentException("Изменений нет");
-        return Map.of("status", "success");
-    }
-
-    @GetMapping("/user-info/{id}")
-    @ResponseBody
-    public Map<String, Object> getUserInfo(@PathVariable Long id) {
-        User user = userService.findById(id);
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("id", user.getId());
-        response.put("username", user.getUsername());
-        response.put("roleNames", user.getRoles().stream()
-                .map(Role::getName)
-                .toList());
-        return response;
-    }
-
-    @GetMapping("/roles")
-    @ResponseBody
-    public List<Role> getAllRoles() {
-        return roleService.findAll();
+    public String updateUser(@PathVariable Long id, @ModelAttribute UserEditDto userDto) {
+        if (userDto.getId() != null && id != null) {
+            userService.updateUser(userDto, id);
+        } else throw new IllegalArgumentException("Пустой пользователь");
+        return "redirect:/admin";
     }
 
     @DeleteMapping("/delete/{id}")
-    @ResponseBody
-    public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
+    public String deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
-        return  ResponseEntity.ok("User deleted successfully");
+        return "redirect:/admin";
     }
 }

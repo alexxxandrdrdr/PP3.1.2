@@ -6,6 +6,7 @@ import com.example.demo.model.Role;
 import com.example.demo.model.User;
 import com.example.demo.model.UserEditDto;
 import com.example.demo.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +34,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public User findById(Long id) throws IllegalArgumentException{
-        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Пользователь с id=" + id + " не найден"));
+    public User findById(Long id) throws EntityNotFoundException {
+        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Пользователь с id=" + id + " не найден"));
     }
 
     public void updateUser(UserEditDto userEditDto, Long id) {
@@ -43,14 +44,14 @@ public class UserService {
         }
         User user = findById(id);
         if (user == null) {
-            throw new IllegalArgumentException("Пользователь с ID " + id + " не найден");
+            throw new EntityNotFoundException("Пользователь с ID " + id + " не найден");
         }
         user.setUsername(userEditDto.getUsername());
 
         if (userEditDto.getPassword() != null && !userEditDto.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(userEditDto.getPassword()));
         }
-        Set<Role> roles = userEditDto.getRoles().stream()
+        Set<Role> roles = userEditDto.getRoleIds().stream()
                 .map(roleService::findById)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());

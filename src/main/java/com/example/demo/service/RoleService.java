@@ -17,12 +17,15 @@ public class RoleService {
     public RoleService(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;
     }
+
     public List<Role> findAll() {
         return roleRepository.findAll();
     }
+
     public Role findById(Long id) {
         return roleRepository.findById(id).orElse(null);
     }
+
     public static String rolesToString(Collection<? extends GrantedAuthority> authorities) {
         return authorities.stream()
                 .map(a -> a.getAuthority().replace("ROLE_", ""))

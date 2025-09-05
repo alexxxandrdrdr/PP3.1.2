@@ -1,20 +1,21 @@
 package com.example.demo.model;
 
-
-
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserEditDto {
     private Long id;
     private String username;
     private String password;
-    private List<Long> roles;
+    private List<Long> roleIds;
 
-    public UserEditDto(Long id, String username, String password, List<Long> roles) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.roles = roles;
+    public UserEditDto (){}
+
+    public UserEditDto(User user) {
+        this.id = user.getId();
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+        this.roleIds = user.getRoles().stream().map(Role::getId).collect(Collectors.toList());
     }
 
     public Long getId() {
@@ -41,11 +42,11 @@ public class UserEditDto {
         this.password = password;
     }
 
-    public List<Long> getRoles() {
-        return roles;
+    public List<Long> getRoleIds() {
+        return roleIds;
     }
 
     public void setRoles(List<Long> roles) {
-        this.roles = roles;
+        this.roleIds = roles;
     }
 }
