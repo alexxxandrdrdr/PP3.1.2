@@ -9,7 +9,8 @@ public class UserEditDto {
     private String password;
     private List<Long> roleIds;
 
-    public UserEditDto (){}
+    public UserEditDto() {
+    }
 
     public UserEditDto(User user) {
         this.id = user.getId();

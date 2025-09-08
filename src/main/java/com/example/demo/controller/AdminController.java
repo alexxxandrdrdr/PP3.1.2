@@ -6,12 +6,11 @@ import com.example.demo.model.UserEditDto;
 import com.example.demo.service.RoleService;
 import com.example.demo.service.UserService;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -23,7 +22,6 @@ import static com.example.demo.service.RoleService.rolesToString;
 public class AdminController {
     private final UserService userService;
     private final RoleService roleService;
-    private final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     public AdminController(UserService userService, RoleService roleService) {
         this.userService = userService;
@@ -54,27 +52,22 @@ public class AdminController {
 
     @GetMapping("/edit-user/{id}")
     public String getUserForEdit(@PathVariable Long id, Model model) {
+        UserEditDto userDto;
         try {
-            UserEditDto userDto = new UserEditDto(userService.findById(id));
-            if (userDto.getId() == null) {
-                logger.warn("userDto is null");
-                return "redirect:/admin";
-            }
-            List<Role> roles = roleService.findAll();
-            model.addAttribute("userDto", userDto);
-            model.addAttribute("rolesAll", roles);
+            userDto = new UserEditDto(userService.findById(id));
+        } catch (EntityNotFoundException e) {
+            model.addAttribute("error", "User with id " + id + " not found");
             return "admin/editUser";
-        } catch (Exception e) {
-            return "redirect:/admin";
         }
-
+        List<Role> roles = roleService.findAll();
+        model.addAttribute("userDto", userDto);
+        model.addAttribute("rolesAll", roles);
+        return "admin/editUser";
     }
 
     @PatchMapping("/edit-user/{id}")
     public String updateUser(@PathVariable Long id, @ModelAttribute UserEditDto userDto) {
-        if (userDto.getId() != null && id != null) {
-            userService.updateUser(userDto, id);
-        } else throw new IllegalArgumentException("Пустой пользователь");
+        userService.updateUser(userDto, id);
         return "redirect:/admin";
     }
 

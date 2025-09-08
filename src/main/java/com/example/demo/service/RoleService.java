@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-
 import com.example.demo.model.Role;
 import com.example.demo.repository.RoleRepository;
 import org.springframework.security.core.GrantedAuthority;

@@ -16,17 +16,17 @@
           th:method="patch">
         <div>
             <label for="edit-id">Id</label>
-            <input type="text" id="edit-id" name="id" th:value="${userDto.id}" readonly />
+            <input type="text" id="edit-id" name="id" th:value="${userDto.id}" readonly/>
         </div>
         <div>
             <label for="edit-username">Имя пользователя</label>
-            <input type="text" id="edit-username" name="username" th:value="${userDto.username ?: ''}" />
+            <input type="text" id="edit-username" name="username" th:value="${userDto.username ?: ''}"/>
             <span th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color: red;"></span>
         </div>
         <div>
             <label for="edit-password">Пароль</label>
             <input type="password" id="edit-password" name="password"
-                   placeholder="Введите новый пароль (если нужно)" />
+                   placeholder="Введите новый пароль (если нужно)"/>
         </div>
         <div>
             <label for="edit-roles">Роли</label>

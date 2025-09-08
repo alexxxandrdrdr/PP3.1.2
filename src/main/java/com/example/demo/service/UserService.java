@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 
-
 import com.example.demo.model.Role;
 import com.example.demo.model.User;
 import com.example.demo.model.UserEditDto;
@@ -20,6 +19,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
+
     public UserService(UserRepository userRepository, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleService = roleService;
@@ -29,6 +29,7 @@ public class UserService {
     public List<User> findAll() {
         return userRepository.findAll();
     }
+
     public void save(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
@@ -39,25 +40,29 @@ public class UserService {
     }
 
     public void updateUser(UserEditDto userEditDto, Long id) {
-        if (!id.equals(userEditDto.getId())) {
-            throw new IllegalArgumentException("ID в пути не совпадает с ID пользователя");
-        }
-        User user = findById(id);
-        if (user == null) {
-            throw new EntityNotFoundException("Пользователь с ID " + id + " не найден");
-        }
-        user.setUsername(userEditDto.getUsername());
+        if (userEditDto.getId() != null && id != null) {
+            if (!id.equals(userEditDto.getId())) {
+                throw new IllegalArgumentException("ID в пути не совпадает с ID пользователя");
+            }
+            User user = findById(id);
+            if (user == null) {
+                throw new EntityNotFoundException("Пользователь с ID " + id + " не найден");
+            }
+            user.setUsername(userEditDto.getUsername());
 
-        if (userEditDto.getPassword() != null && !userEditDto.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(userEditDto.getPassword()));
-        }
-        Set<Role> roles = userEditDto.getRoleIds().stream()
-                .map(roleService::findById)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-        user.setRoles(roles);
+            if (userEditDto.getPassword() != null && !userEditDto.getPassword().isEmpty()) {
+                user.setPassword(passwordEncoder.encode(userEditDto.getPassword()));
+            }
+            Set<Role> roles = userEditDto.getRoleIds().stream()
+                    .map(roleService::findById)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+            user.setRoles(roles);
 
-        userRepository.save(user);
+            userRepository.save(user);
+        } else {
+            throw new IllegalArgumentException("Передан пустой пользователь");
+        }
     }
 
     public void deleteUser(Long id) {
