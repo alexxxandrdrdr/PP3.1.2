@@ -14,9 +14,8 @@ import static com.example.demo.service.RoleService.rolesToString;
 public class UserController {
     @GetMapping
     public String showUserPage(Model model, @AuthenticationPrincipal User user) {
-        String roles = rolesToString(user.getRoles());
         model.addAttribute("authUser", user);
-        model.addAttribute("roles", roles);
+        model.addAttribute("roles", rolesToString(user.getRoles()));
         return "user/user";
     }
 }
