@@ -7,7 +7,7 @@ public class UserEditDto {
     private Long id;
     private String username;
     private String password;
-    private List<Long> roleIds;
+    private List<Long> rolesIds;
 
     public UserEditDto() {
     }
@@ -16,7 +16,7 @@ public class UserEditDto {
         this.id = user.getId();
         this.username = user.getUsername();
         this.password = user.getPassword();
-        this.roleIds = user.getRoles().stream().map(Role::getId).collect(Collectors.toList());
+        this.rolesIds = user.getRoles().stream().map(Role::getId).collect(Collectors.toList());
     }
 
     public Long getId() {
@@ -43,11 +43,11 @@ public class UserEditDto {
         this.password = password;
     }
 
-    public List<Long> getRoleIds() {
-        return roleIds;
+    public List<Long> getRolesIds() {
+        return rolesIds;
     }
 
     public void setRoles(List<Long> roles) {
-        this.roleIds = roles;
+        this.rolesIds = roles;
     }
 }

@@ -34,7 +34,7 @@
                 <option th:each="role : ${rolesAll}"
                         th:value="${role.id}"
                         th:text="${role.name}"
-                        th:selected="${userDto.roleIds != null and userDto.roleIds.contains(role.id)}"></option>
+                        th:selected="${userDto.rolesIds != null and userDto.rolesIds.contains(role.id)}"></option>
             </select>
         </div>
         <div>

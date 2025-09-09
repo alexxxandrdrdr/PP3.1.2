@@ -2,8 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.model.User;
 import com.example.demo.model.UserEditDto;
-import com.example.demo.service.RoleServiceImpl;
-import com.example.demo.service.UserServiceImpl;
+import com.example.demo.service.RoleService;
+import com.example.demo.service.UserService;
+
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,41 +18,41 @@ import static com.example.demo.service.RoleService.rolesToString;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
-    private final UserServiceImpl userServiceImpl;
-    private final RoleServiceImpl roleServiceImpl;
+    private final UserService userService;
+    private final RoleService roleService;
 
-    public AdminController(UserServiceImpl userServiceImpl, RoleServiceImpl roleServiceImpl) {
-        this.userServiceImpl = userServiceImpl;
-        this.roleServiceImpl = roleServiceImpl;
+    public AdminController(UserService userService, RoleService roleService) {
+        this.userService = userService;
+        this.roleService = roleService;
     }
 
     @GetMapping
     public String showAdminPanel(Model model, @AuthenticationPrincipal User user) {
         model.addAttribute("authRoles", rolesToString(user.getRoles()));
         model.addAttribute("authUser", user);
-        model.addAttribute("roles", roleServiceImpl.findAll());
-        model.addAttribute("usersList", userServiceImpl.findAll());
+        model.addAttribute("roles", roleService.findAll());
+        model.addAttribute("usersList", userService.findAll());
         return "admin/panel";
     }
 
     @GetMapping("/addUser")
     public String showCreateUser(@ModelAttribute("user") User user) {
-        userServiceImpl.save(user);
+        userService.save(user);
         return "admin/addNewUser";
     }
 
     @PostMapping("/addUser")
     public String createUser(@ModelAttribute("user") User user) {
-        userServiceImpl.save(user);
+        userService.save(user);
         return "redirect:/admin";
     }
 
     @GetMapping("/edit-user/{id}")
     public String getUserForEdit(@PathVariable Long id, Model model) {
         try {
-            UserEditDto userDto = new UserEditDto(userServiceImpl.findById(id));
+            UserEditDto userDto = new UserEditDto(userService.findById(id));
             model.addAttribute("userDto", userDto);
-            model.addAttribute("rolesAll", roleServiceImpl.findAll());
+            model.addAttribute("rolesAll", roleService.findAll());
         } catch (EntityNotFoundException e) {
             model.addAttribute("error", "Пользователь с id:" + id + "не найден");
         }
@@ -60,13 +61,13 @@ public class AdminController {
 
     @PatchMapping("/edit-user/{id}")
     public String updateUser(@PathVariable Long id, @ModelAttribute UserEditDto userDto) {
-        userServiceImpl.updateUser(userDto, id);
+        userService.updateUser(userDto, id);
         return "redirect:/admin";
     }
 
     @DeleteMapping("/delete/{id}")
     public String deleteUser(@PathVariable("id") Long id) {
-        userServiceImpl.deleteUser(id);
+        userService.deleteUser(id);
         return "redirect:/admin";
     }
 }

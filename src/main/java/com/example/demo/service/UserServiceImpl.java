@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
             if (userEditDto.getPassword() != null && !userEditDto.getPassword().isEmpty()) {
                 user.setPassword(passwordEncoder.encode(userEditDto.getPassword()));
             }
-            Set<Role> roles = userEditDto.getRoleIds().stream()
+            Set<Role> roles = userEditDto.getRolesIds().stream()
                     .map(roleServiceImpl::findById)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
