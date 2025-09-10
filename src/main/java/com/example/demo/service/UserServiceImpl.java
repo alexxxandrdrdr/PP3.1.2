@@ -17,12 +17,12 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final RoleServiceImpl roleServiceImpl;
+    private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, RoleServiceImpl roleServiceImpl, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, RoleService roleService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.roleServiceImpl = roleServiceImpl;
+        this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll();
     }
 
-    public void save(User user) {
+    public void saveUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
                 user.setPassword(passwordEncoder.encode(userEditDto.getPassword()));
             }
             Set<Role> roles = userEditDto.getRolesIds().stream()
-                    .map(roleServiceImpl::findById)
+                    .map(roleService::findById)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
             user.setRoles(roles);

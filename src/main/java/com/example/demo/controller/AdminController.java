@@ -12,8 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import static com.example.demo.service.RoleService.rolesToString;
-
 
 @Controller
 @RequestMapping("/admin")
@@ -28,7 +26,7 @@ public class AdminController {
 
     @GetMapping
     public String showAdminPanel(Model model, @AuthenticationPrincipal User user) {
-        model.addAttribute("authRoles", rolesToString(user.getRoles()));
+        model.addAttribute("authRoles", roleService.rolesToString(user.getRoles()));
         model.addAttribute("authUser", user);
         model.addAttribute("roles", roleService.findAll());
         model.addAttribute("usersList", userService.findAll());
@@ -37,13 +35,13 @@ public class AdminController {
 
     @GetMapping("/addUser")
     public String showCreateUser(@ModelAttribute("user") User user) {
-        userService.save(user);
+        userService.saveUser(user);
         return "admin/addNewUser";
     }
 
     @PostMapping("/addUser")
     public String createUser(@ModelAttribute("user") User user) {
-        userService.save(user);
+        userService.saveUser(user);
         return "redirect:/admin";
     }
 

@@ -13,10 +13,5 @@ public interface RoleService {
 
     Role findById(Long id);
 
-    static String rolesToString(Collection<? extends GrantedAuthority> authorities) {
-        return authorities.stream()
-                .map(a -> a.getAuthority().replace("ROLE_", ""))
-                .sorted()
-                .collect(Collectors.joining(", "));
-    }
+    String rolesToString(Collection<? extends GrantedAuthority> authorities);
 }

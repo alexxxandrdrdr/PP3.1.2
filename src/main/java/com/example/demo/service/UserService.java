@@ -10,7 +10,7 @@ import java.util.List;
 public interface UserService {
     List<User> findAll();
 
-    void save(User user);
+    void saveUser(User user);
 
     User findById(Long id) throws EntityNotFoundException;
 
